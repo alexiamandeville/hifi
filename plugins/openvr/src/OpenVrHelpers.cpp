@@ -191,8 +191,7 @@ void enableOpenVrKeyboard(PluginContainer* container) {
     }
     auto offscreenUi = DependencyManager::get<OffscreenUi>();
     _overlay = vr::VROverlay();
-
-
+   
     auto menu = container->getPrimaryMenu();
     auto action = menu->getActionForOption(MenuOption::Overlays);
 
@@ -204,6 +203,7 @@ void enableOpenVrKeyboard(PluginContainer* container) {
             QTimer::singleShot(KEYBOARD_DELAY_MS, [&] { _overlayRevealed = false; });
         }
     });
+    
 }
 
 

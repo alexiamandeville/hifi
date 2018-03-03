@@ -84,7 +84,7 @@
           "to": "Actions.Yaw",
           "filters":
             [
-                { "type": "scale", "scale": 0.6 }
+                { "type": "scale", "scale": 0.1 }
             ]
         },
 

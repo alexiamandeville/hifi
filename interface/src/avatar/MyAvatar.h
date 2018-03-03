@@ -367,6 +367,8 @@ public:
     Q_INVOKABLE void setSnapTurn(bool on) { _useSnapTurn = on; }
     Q_INVOKABLE bool getClearOverlayWhenMoving() const { return _clearOverlayWhenMoving; }
     Q_INVOKABLE void setClearOverlayWhenMoving(bool on) { _clearOverlayWhenMoving = on; }
+    Q_INVOKABLE bool getShowOverlays() const { return _showOverlays; }
+    Q_INVOKABLE void setShowOverlays(bool on) { _showOverlays = on; }
 
     Q_INVOKABLE void setDominantHand(const QString& hand);
     Q_INVOKABLE QString getDominantHand() const { return _dominantHand; }
@@ -756,6 +758,7 @@ private:
     QUrl _fstAnimGraphOverrideUrl;
     bool _useSnapTurn { true };
     bool _clearOverlayWhenMoving { true };
+    bool _showOverlays{ true };
     QString _dominantHand { DOMINANT_RIGHT_HAND };
 
     const float ROLL_CONTROL_DEAD_ZONE_DEFAULT = 8.0f; // degrees

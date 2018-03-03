@@ -29,6 +29,7 @@ if (previousSetting === true) {
     isChecked = true;
 }
 
+/*
 function addAdvancedMovementItemToSettingsMenu() {
     Menu.addMenuItem({
         menuName: "Settings",
@@ -37,6 +38,7 @@ function addAdvancedMovementItemToSettingsMenu() {
         isChecked: previousSetting
     });
 }
+*/
 
 function rotate180() {
     var newOrientation = Quat.multiply(MyAvatar.orientation, Quat.angleAxis(180, {

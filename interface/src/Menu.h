@@ -114,6 +114,9 @@ namespace MenuOption {
     const QString Forward = "Forward";
     const QString FrameTimer = "Show Timer";
     const QString FullscreenMirror = "Mirror";
+    const QString GraphicsHigh = "Fantastic";
+    const QString GraphicsMed = "Simple";
+    const QString GraphicsLow = "Fast";
     const QString Help = "Help...";
     const QString IncreaseAvatarSize = "Increase Avatar Size";
     const QString IndependentMode = "Independent Mode";
@@ -121,7 +124,7 @@ namespace MenuOption {
     const QString LoadScript = "Open and Run Script File...";
     const QString LoadScriptURL = "Open and Run Script from URL...";
     const QString LodTools = "LOD Tools";
-    const QString Login = "Login / Sign Up";
+    const QString Login = "Login/Sign Up";
     const QString Log = "Log";
     const QString LogExtraTimings = "Log Extra Timing Details";
     const QString LowVelocityFilter = "Low Velocity Filter";
@@ -136,8 +139,8 @@ namespace MenuOption {
     const QString OnlyDisplayTopTen = "Only Display Top Ten";
     const QString OpenVrThreadedSubmit = "OpenVR Threaded Submit"; 
     const QString OutputMenu = "Display";
-    const QString Overlays = "Overlays";
-    const QString PackageModel = "Package Model...";
+    const QString Overlays = "Show Overlays";
+    const QString PackageModel = "Package Model as .fst...";
     const QString Pair = "Pair";
     const QString PhysicsShowHulls = "Draw Collision Shapes";
     const QString PhysicsShowOwned = "Highlight Simulation Ownership";

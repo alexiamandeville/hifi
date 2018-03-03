@@ -61,11 +61,6 @@ void setupPreferences() {
         auto setter = [=](bool value) { myAvatar->setSnapTurn(value); };
         preferences->addPreference(new CheckPreference(AVATAR_BASICS, "Snap turn when in HMD", getter, setter));
     }
-    {
-        auto getter = [=]()->bool { return myAvatar->getClearOverlayWhenMoving(); };
-        auto setter = [=](bool value) { myAvatar->setClearOverlayWhenMoving(value); };
-        preferences->addPreference(new CheckPreference(AVATAR_BASICS, "Clear overlays when moving", getter, setter));
-    }
 
     // UI
     static const QString UI_CATEGORY { "UI" };
@@ -83,11 +78,30 @@ void setupPreferences() {
         preferences->addPreference(preference);
     }
 
-
     {
         auto getter = []()->bool { return qApp->getPreferStylusOverLaser(); };
         auto setter = [](bool value) { qApp->setPreferStylusOverLaser(value); };
         preferences->addPreference(new CheckPreference(UI_CATEGORY, "Prefer Stylus Over Laser", getter, setter));
+    }
+
+    {
+        static const QString RETICLE_ICON_NAME = { Cursor::Manager::getIconName(Cursor::Icon::RETICLE) };
+        auto getter = []()->bool { return qApp->getPreferredCursor() == RETICLE_ICON_NAME; };
+        auto setter = [](bool value) { qApp->setPreferredCursor(value ? RETICLE_ICON_NAME : QString()); };
+        preferences->addPreference(new CheckPreference(UI_CATEGORY, "Use reticle cursor instead of arrow", getter, setter));
+    }
+
+    //TODO: make sure this works, not hooked up
+    {
+        auto getter = [=]()->bool { return myAvatar->getShowOverlays(); };
+        auto setter = [=](bool value) { myAvatar->setShowOverlays(value); };
+        preferences->addPreference(new CheckPreference(UI_CATEGORY, MenuOption::Overlays, getter, setter));
+    }
+
+    {
+        auto getter = [=]()->bool { return myAvatar->getClearOverlayWhenMoving(); };
+        auto setter = [=](bool value) { myAvatar->setClearOverlayWhenMoving(value); };
+        preferences->addPreference(new CheckPreference(UI_CATEGORY, "Clear overlays when moving", getter, setter));
     }
 
     static const QString ADVANCED_UI_CATEGORY { "Advanced UI" };
@@ -126,12 +140,6 @@ void setupPreferences() {
         preferences->addPreference(new CheckPreference(UI_CATEGORY, "Prefer Avatar Finger Over Stylus", getter, setter));
     }
     */
-    {
-        static const QString RETICLE_ICON_NAME = { Cursor::Manager::getIconName(Cursor::Icon::RETICLE) };
-        auto getter = []()->bool { return qApp->getPreferredCursor() == RETICLE_ICON_NAME; };
-        auto setter = [](bool value) { qApp->setPreferredCursor(value ? RETICLE_ICON_NAME : QString()); };
-        preferences->addPreference(new CheckPreference(UI_CATEGORY, "Use reticle cursor instead of arrow", getter, setter));
-    }
 
     // Snapshots
     static const QString SNAPSHOTS { "Snapshots" };
@@ -181,12 +189,16 @@ void setupPreferences() {
         preferences->addPreference(preference);
     }
 
+    //this is removed due to it being in the Avatar app
+    /*
     static const QString AVATAR_TUNING { "Avatar Tuning" };
+    
     {
         auto getter = [=]()->QString { return myAvatar->getDominantHand(); };
         auto setter = [=](const QString& value) { myAvatar->setDominantHand(value); };
         preferences->addPreference(new PrimaryHandPreference(AVATAR_TUNING, "Dominant Hand", getter, setter));
     }
+    
     {
         auto getter = [=]()->float { return myAvatar->getTargetScale(); };
         auto setter = [=](float value) { myAvatar->setTargetScale(value); };
@@ -211,24 +223,43 @@ void setupPreferences() {
         preferences->addPreference(preference);
     }
     {
-        auto getter = []()->float { return DependencyManager::get<DdeFaceTracker>()->getEyeClosingThreshold(); };
-        auto setter = [](float value) { DependencyManager::get<DdeFaceTracker>()->setEyeClosingThreshold(value); };
-        preferences->addPreference(new SliderPreference(AVATAR_TUNING, "Camera binary eyelid threshold", getter, setter));
-    }
-    {
-        auto getter = []()->float { return FaceTracker::getEyeDeflection(); };
-        auto setter = [](float value) { FaceTracker::setEyeDeflection(value); };
-        preferences->addPreference(new SliderPreference(AVATAR_TUNING, "Face tracker eye deflection", getter, setter));
-    }
-    {
         auto getter = [=]()->QString { return myAvatar->getAnimGraphOverrideUrl().toString(); };
         auto setter = [=](const QString& value) { myAvatar->setAnimGraphOverrideUrl(QUrl(value)); };
         auto preference = new EditPreference(AVATAR_TUNING, "Avatar animation JSON", getter, setter);
         preference->setPlaceholderText("default");
         preferences->addPreference(preference);
     }
+    */
 
-    static const QString AVATAR_CAMERA { "Avatar Camera" };
+    static const QString FACE_TRACKING{ "Face Tracking" };
+
+    {
+        auto getter = []()->float { return DependencyManager::get<DdeFaceTracker>()->getEyeClosingThreshold(); };
+        auto setter = [](float value) { DependencyManager::get<DdeFaceTracker>()->setEyeClosingThreshold(value); };
+        preferences->addPreference(new SliderPreference(FACE_TRACKING, "Eye Closing Threshold", getter, setter));
+    }
+    {
+        auto getter = []()->float { return FaceTracker::getEyeDeflection(); };
+        auto setter = [](float value) { FaceTracker::setEyeDeflection(value); };
+        preferences->addPreference(new SliderPreference(FACE_TRACKING, "Eye Deflection", getter, setter));
+    }
+
+    static const QString MOVEMENT{ "Movement" };
+
+    {
+        auto getter = [=]()->bool { return myAvatar->getSnapTurn(); };
+        auto setter = [=](bool value) { myAvatar->setSnapTurn(value); };
+        preferences->addPreference(new CheckPreference(MOVEMENT, "Snap turn when in HMD", getter, setter));
+    }
+
+    //TODO: Update with advanced movement, make sure it works
+    {
+        auto getter = [=]()->bool { return myAvatar->useAdvancedMovementControls(); };
+        auto setter = [=](bool value) { myAvatar->setUseAdvancedMovementControls(value); };
+        preferences->addPreference(new CheckPreference(MOVEMENT, "Advanced Movement Controls", getter, setter));
+    }
+
+    static const QString AVATAR_CAMERA { "Camera" };
     {
         auto getter = [=]()->float { return myAvatar->getPitchSpeed(); };
         auto setter = [=](float value) { myAvatar->setPitchSpeed(value); };

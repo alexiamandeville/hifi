@@ -77,7 +77,7 @@ Menu::Menu() {
     }
 
     // File > Help
-    addActionToQMenuAndActionHash(fileMenu, MenuOption::Help, 0, qApp, SLOT(showHelp()));
+    //addActionToQMenuAndActionHash(fileMenu, MenuOption::Help, 0, qApp, SLOT(showHelp()));
 
     // File > Quit
     addActionToQMenuAndActionHash(fileMenu, MenuOption::Quit, Qt::CTRL | Qt::Key_Q, qApp, SLOT(quit()), QAction::QuitRole);
@@ -97,6 +97,22 @@ Menu::Menu() {
     redoAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_Z);
     addActionToQMenuAndActionHash(editMenu, redoAction);
 
+    editMenu->addSeparator();
+
+    // Edit > Cut
+    addActionToQMenuAndActionHash(editMenu, "Cut", Qt::CTRL | Qt::Key_X);
+
+    // Edit > Copy
+    addActionToQMenuAndActionHash(editMenu, "Copy", Qt::CTRL | Qt::Key_C);
+
+    // Edit > Paste
+    addActionToQMenuAndActionHash(editMenu, "Paste", Qt::CTRL | Qt::Key_V);
+
+    // Edit > Delete
+    addActionToQMenuAndActionHash(editMenu, "Delete", Qt::Key_Delete);
+
+    editMenu->addSeparator();
+
     // Edit > Running Scripts
     auto action = addActionToQMenuAndActionHash(editMenu, MenuOption::RunningScripts, Qt::CTRL | Qt::Key_J);
     connect(action, &QAction::triggered, [] {
@@ -106,7 +122,10 @@ Menu::Menu() {
         qApp->showDialog(widgetUrl, tabletUrl, name);
     });
 
+    editMenu->addSeparator();
+
     // Edit > Open and Run Script from File... [advanced]
+    /*
     addActionToQMenuAndActionHash(editMenu, MenuOption::LoadScript, Qt::CTRL | Qt::Key_O,
         qApp, SLOT(loadDialog()),
         QAction::NoRole, UNSPECIFIED_POSITION, "Advanced");
@@ -130,17 +149,9 @@ Menu::Menu() {
         DependencyManager::get<ScriptEngines>()->reloadAllScripts();
         DependencyManager::get<OffscreenUi>()->clearCache();
     });
+    */
 
-
-    // Edit > Console... [advanced]
-    addActionToQMenuAndActionHash(editMenu, MenuOption::Console, Qt::CTRL | Qt::ALT | Qt::Key_J,
-        DependencyManager::get<StandAloneJSConsole>().data(),
-        SLOT(toggleConsole()),
-        QAction::NoRole, UNSPECIFIED_POSITION, "Advanced");
-
-    editMenu->addSeparator();
-
-    // Edit > My Asset Server
+    // Edit > Asset Browser
     auto assetServerAction = addActionToQMenuAndActionHash(editMenu, MenuOption::AssetServer,
                                                            Qt::CTRL | Qt::SHIFT | Qt::Key_A,
                                                            qApp, SLOT(showAssetServerWidget()));
@@ -148,19 +159,20 @@ Menu::Menu() {
     QObject::connect(nodeList.data(), &NodeList::canWriteAssetsChanged, assetServerAction, &QAction::setEnabled);
     assetServerAction->setEnabled(nodeList->getThisNodeCanWriteAssets());
 
-    // Edit > Package Model... [advanced]
+    // Edit > Package Model...
     addActionToQMenuAndActionHash(editMenu, MenuOption::PackageModel, 0,
         qApp, SLOT(packageModel()),
-        QAction::NoRole, UNSPECIFIED_POSITION, "Advanced");
+        QAction::NoRole);
 
-    // Edit > Reload All Content [advanced]
+    // Edit > Reload All Content
     addActionToQMenuAndActionHash(editMenu, MenuOption::ReloadContent, 0, qApp, SLOT(reloadResourceCaches()),
-                                  QAction::NoRole, UNSPECIFIED_POSITION, "Advanced");
+                                  QAction::NoRole);
 
     // Avatar menu ----------------------------------
-    MenuWrapper* avatarMenu = addMenu("Avatar");
     auto avatarManager = DependencyManager::get<AvatarManager>();
     auto avatar = avatarManager->getMyAvatar();
+    /*
+    MenuWrapper* avatarMenu = addMenu("Avatar");
 
     // Avatar > Attachments...
     action = addActionToQMenuAndActionHash(avatarMenu, MenuOption::Attachments);
@@ -205,6 +217,8 @@ Menu::Menu() {
     // Avatar > AvatarBookmarks related menus -- Note: the AvatarBookmarks class adds its own submenus here.
     auto avatarBookmarks = DependencyManager::get<AvatarBookmarks>();
     avatarBookmarks->setupMenus(this, avatarMenu);
+    */
+    
 
     // Display menu ----------------------------------
     // FIXME - this is not yet matching Alan's spec because it doesn't have
@@ -232,7 +246,7 @@ Menu::Menu() {
 
     // View > Third Person
     auto thirdPersonAction = cameraModeGroup->addAction(addCheckableActionToQMenuAndActionHash(
-                                   viewMenu, MenuOption::ThirdPerson, Qt::CTRL | Qt::Key_G,
+                                   viewMenu, MenuOption::ThirdPerson, Qt::CTRL | Qt::Key_T,
                                    false, qApp, SLOT(cameraMenuChanged())));
 
     thirdPersonAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
@@ -244,36 +258,37 @@ Menu::Menu() {
 
     viewMirrorAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
 
-    // View > Independent [advanced]
+    // View > Independent
+    /*
     auto viewIndependentAction = cameraModeGroup->addAction(addCheckableActionToQMenuAndActionHash(viewMenu,
         MenuOption::IndependentMode, 0,
-        false, qApp, SLOT(cameraMenuChanged()),
-        UNSPECIFIED_POSITION, "Advanced"));
-
+        false, qApp, SLOT(cameraMenuChanged())));
+        
     viewIndependentAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
+    */
 
-    // View > Entity Camera [advanced]
+    // View > Entity Camera
+    /*
     auto viewEntityCameraAction = cameraModeGroup->addAction(addCheckableActionToQMenuAndActionHash(viewMenu,
         MenuOption::CameraEntityMode, 0,
-        false, qApp, SLOT(cameraMenuChanged()),
-        UNSPECIFIED_POSITION, "Advanced"));
+        false, qApp, SLOT(cameraMenuChanged())));
 
     viewEntityCameraAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
-
+    */
     viewMenu->addSeparator();
 
     // View > Center Player In View
     addCheckableActionToQMenuAndActionHash(viewMenu, MenuOption::CenterPlayerInView,
-        0, true, qApp, SLOT(rotationModeChanged()),
-        UNSPECIFIED_POSITION, "Advanced");
+        0, true, qApp, SLOT(rotationModeChanged()));
 
-    // View > Overlays
-    addCheckableActionToQMenuAndActionHash(viewMenu, MenuOption::Overlays, 0, true);
+    // View > Show Overlays
+    addCheckableActionToQMenuAndActionHash(viewMenu, MenuOption::Overlays, 0, true); //TODO: remove this, but the action is tied to some other places in code
 
     // View > Enter First Person Mode in HMD
     addCheckableActionToQMenuAndActionHash(viewMenu, MenuOption::FirstPersonHMD, 0, true);
 
     // Navigate menu ----------------------------------
+    /*
     MenuWrapper* navigateMenu = addMenu("Navigate");
 
     // Navigate > Show Address Bar
@@ -294,24 +309,68 @@ Menu::Menu() {
     addActionToQMenuAndActionHash(navigateMenu, MenuOption::CopyPath, 0,
         addressManager.data(), SLOT(copyPath()),
         QAction::NoRole, UNSPECIFIED_POSITION, "Advanced");
-
+     
+     */
 
     // Settings menu ----------------------------------
     MenuWrapper* settingsMenu = addMenu("Settings");
 
-    // Settings > Advance Menus
-    addCheckableActionToQMenuAndActionHash(settingsMenu, "Advanced Menus", 0, false, this, SLOT(toggleAdvancedMenus()));
-
-    // Settings > Developer Menus
-    addCheckableActionToQMenuAndActionHash(settingsMenu, "Developer Menus", 0, false, this, SLOT(toggleDeveloperMenus()));
+    // Settings > Advanced Menus
+    //addCheckableActionToQMenuAndActionHash(settingsMenu, "Advanced Menus", 0, false, this, SLOT(toggleAdvancedMenus()));
 
     // Settings > General...
-    action = addActionToQMenuAndActionHash(settingsMenu, MenuOption::Preferences, Qt::CTRL | Qt::Key_Comma, nullptr, nullptr, QAction::PreferencesRole);
+    action = addActionToQMenuAndActionHash(settingsMenu, MenuOption::Preferences, Qt::CTRL | Qt::Key_G, nullptr, nullptr, QAction::PreferencesRole);
     connect(action, &QAction::triggered, [] {
         qApp->showDialog(QString("hifi/dialogs/GeneralPreferencesDialog.qml"),
             QString("hifi/tablet/TabletGeneralPreferences.qml"), "GeneralPreferencesDialog");
     });
 
+    // Settings > Controls...
+    action = addActionToQMenuAndActionHash(settingsMenu, "Controls...");
+    connect(action, &QAction::triggered, [] {
+
+        static const QUrl tabletUrl("hifi/tablet/ControllerSettings.qml");
+        static const QString name("ControlSettings");
+        qApp->showDialog(tabletUrl, tabletUrl, name);
+    });
+
+    // Settings > Controls...
+    /*
+    action = addActionToQMenuAndActionHash(settingsMenu, "Controls...");
+    connect(action, &QAction::triggered, [] {
+        auto tablet = DependencyManager::get<TabletScriptingInterface>()->getTablet("com.highfidelity.interface.tablet.system");
+        auto hmd = DependencyManager::get<HMDScriptingInterface>();
+        tablet->loadQMLSource("hifi/tablet/ControllerSettings.qml");
+
+        if (!hmd->getShouldShowTablet()) {
+            hmd->toggleShouldShowTablet();
+        }
+    });
+    */
+
+    // Settings > Graphics...
+    MenuWrapper* graphicsMenu = settingsMenu->addMenu("Graphics"); //This was in Developer menu. The menu needs to be moved here. 
+    QActionGroup* graphicsSettingGroup = new QActionGroup(graphicsMenu);
+
+    // Settings > Graphics > [graphics settings group]
+    graphicsSettingGroup->setExclusive(true);
+
+    // Settings > Graphics > High
+    auto highAction = graphicsSettingGroup->addAction(addCheckableActionToQMenuAndActionHash(
+        graphicsMenu, MenuOption::GraphicsHigh, false, qApp));
+    highAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(graphicsSettingGroup));
+
+    // Settings > Graphics > Med
+    auto medAction = graphicsSettingGroup->addAction(addCheckableActionToQMenuAndActionHash(
+        graphicsMenu, MenuOption::GraphicsMed, true, qApp));
+    medAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(graphicsSettingGroup));
+
+    // Settings > Graphics > Low
+    auto lowAction = graphicsSettingGroup->addAction(addCheckableActionToQMenuAndActionHash(
+        graphicsMenu, MenuOption::GraphicsLow, false, qApp));
+    lowAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(graphicsSettingGroup));
+
+    // Settings > Audio...
     action = addActionToQMenuAndActionHash(settingsMenu, "Audio...");
     connect(action, &QAction::triggered, [] {
         static const QUrl widgetUrl("hifi/dialogs/Audio.qml");
@@ -321,51 +380,79 @@ Menu::Menu() {
     });
 
     // Settings > Avatar...
+    /*
     action = addActionToQMenuAndActionHash(settingsMenu, "Avatar...");
     connect(action, &QAction::triggered, [] {
         qApp->showDialog(QString("hifi/dialogs/AvatarPreferencesDialog.qml"),
             QString("hifi/tablet/TabletAvatarPreferences.qml"), "AvatarPreferencesDialog");
     });
+    */    
+
+    // Settings > Notifications
+    MenuWrapper* notificationsMenu = settingsMenu->addMenu("Notifications"); //This was in notifications.js. The menu needs to be moved here. 
+    
+
+    //TODO: Hookup notification actions below.
+    // Settings > Notifications > Play Notification Sounds
+    addActionToQMenuAndActionHash(notificationsMenu, "Play Notification Sounds");
+
+    notificationsMenu->addSeparator();
+
+    // Settings > Notifications > Play Sounds for:
+    addDisabledActionAndSeparator(notificationsMenu, "Play Sounds for:");
+
+    // Settings > Notifications > Snapshot Notifications
+    addActionToQMenuAndActionHash(notificationsMenu, "Snapshot Notifications");
+
+    // Settings > Notifications > Level of Detail Notifications
+    addActionToQMenuAndActionHash(notificationsMenu, "Level of Detail Notifications");
+
+    // Settings > Notifications > Connection Notifications
+    addActionToQMenuAndActionHash(notificationsMenu, "Connection Notifications");
+
+    // Settings > Notifications > Connection Refused Notifications
+    addActionToQMenuAndActionHash(notificationsMenu, "Connection Refused Notifications");
+
+    // Settings > Notifications > Edit Error Notifications
+    addActionToQMenuAndActionHash(notificationsMenu, "Edit Error Notifications");
+
+    // Settings > Notifications > Tablet Notifications
+    addActionToQMenuAndActionHash(notificationsMenu, "Tablet Notifications");
+
+    // Settings > Notifications > Wallet Notifications
+    addActionToQMenuAndActionHash(notificationsMenu, "Wallet Notifications");
 
     // Settings > LOD...
-    action = addActionToQMenuAndActionHash(settingsMenu, "LOD...");
+    /*
+    action = addActionToQMenuAndActionHash(settingsMenu, "Level of Detail (LOD)...");
     connect(action, &QAction::triggered, [] {
         qApp->showDialog(QString("hifi/dialogs/LodPreferencesDialog.qml"),
             QString("hifi/tablet/TabletLodPreferences.qml"), "LodPreferencesDialog");
     });
+    */
 
-    action = addActionToQMenuAndActionHash(settingsMenu, "Controller Settings...");
-    connect(action, &QAction::triggered, [] {
-            auto tablet = DependencyManager::get<TabletScriptingInterface>()->getTablet("com.highfidelity.interface.tablet.system");
-            auto hmd = DependencyManager::get<HMDScriptingInterface>();
-            tablet->loadQMLSource("hifi/tablet/ControllerSettings.qml");
-
-            if (!hmd->getShouldShowTablet()) {
-                hmd->toggleShouldShowTablet();
-            }
-        });
-
-    // Settings > Control with Speech [advanced]
+    // Settings > Control with Speech
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN)
     auto speechRecognizer = DependencyManager::get<SpeechRecognizer>();
     QAction* speechRecognizerAction = addCheckableActionToQMenuAndActionHash(settingsMenu, MenuOption::ControlWithSpeech,
         Qt::CTRL | Qt::SHIFT | Qt::Key_C,
         speechRecognizer->getEnabled(),
         speechRecognizer.data(),
-        SLOT(setEnabled(bool)),
-        UNSPECIFIED_POSITION, "Advanced");
+        SLOT(setEnabled(bool)));
     connect(speechRecognizer.data(), SIGNAL(enabledUpdated(bool)), speechRecognizerAction, SLOT(setChecked(bool)));
 #endif
+
+    // Settings > Developer Menu
+    addCheckableActionToQMenuAndActionHash(settingsMenu, "Developer Menu", 0, false, this, SLOT(toggleDeveloperMenus()));
 
     // Developer menu ----------------------------------
     MenuWrapper* developerMenu = addMenu("Developer", "Developer");
 
-    // Developer > Graphics...
-    action = addActionToQMenuAndActionHash(developerMenu, "Graphics...");
-    connect(action, &QAction::triggered, [] {
-        qApp->showDialog(QString("hifi/dialogs/GraphicsPreferencesDialog.qml"),
-            QString("hifi/tablet/TabletGraphicsPreferences.qml"), "GraphicsPreferencesDialog");
-    });
+    // Developer > Console...
+    addActionToQMenuAndActionHash(developerMenu, MenuOption::Console, Qt::CTRL | Qt::ALT | Qt::Key_J,
+        DependencyManager::get<StandAloneJSConsole>().data(),
+        SLOT(toggleConsole()),
+        QAction::NoRole);
 
     // Developer > UI >>>
     MenuWrapper* uiOptionsMenu = developerMenu->addMenu("UI");
@@ -751,18 +838,18 @@ Menu::Menu() {
     });
     essLogAction->setEnabled(nodeList->getThisNodeCanRez());
 
-    action = addActionToQMenuAndActionHash(developerMenu, "Script Log (HMD friendly)...", Qt::NoButton,
+    action = addActionToQMenuAndActionHash(developerMenu, "Script Log (HMD Friendly)...", Qt::NoButton,
                                            qApp, SLOT(showScriptLogs()));
 
     // Developer > Stats
     addCheckableActionToQMenuAndActionHash(developerMenu, MenuOption::Stats);
 
     // Developer > Advanced Settings...
-    action = addActionToQMenuAndActionHash(developerMenu, "Advanced Preferences...");
+    /*action = addActionToQMenuAndActionHash(developerMenu, "Advanced Settings...");
     connect(action, &QAction::triggered, [] {
         qApp->showDialog(QString("hifi/dialogs/AdvancedPreferencesDialog.qml"),
             QString("hifi/tablet/AdvancedPreferencesDialog.qml"), "AdvancedPreferencesDialog");
-    });
+    });*/
 
     // Developer > API Debugger
     action = addActionToQMenuAndActionHash(developerMenu, "API Debugger");
@@ -772,7 +859,7 @@ Menu::Menu() {
         defaultScriptsLoc.setPath(defaultScriptsLoc.path() + "developer/utilities/tools/currentAPI.js");
         scriptEngines->loadScript(defaultScriptsLoc.toString());
     });
-
+    
 #if 0 ///  -------------- REMOVED FOR NOW --------------
     addDisabledActionAndSeparator(navigateMenu, "History");
     QAction* backAction = addActionToQMenuAndActionHash(navigateMenu, MenuOption::Back, 0, addressManager.data(), SLOT(goBack()));
@@ -785,8 +872,8 @@ Menu::Menu() {
     // set the two actions to start disabled since the stacks are clear on startup
     backAction->setDisabled(true);
     forwardAction->setDisabled(true);
-
-    MenuWrapper* toolsMenu = addMenu("Tools");
+	
+    /*MenuWrapper* toolsMenu = addMenu("Tools");
     addActionToQMenuAndActionHash(toolsMenu,
                                   MenuOption::ToolWindow,
                                   Qt::CTRL | Qt::ALT | Qt::Key_T,
@@ -796,8 +883,42 @@ Menu::Menu() {
 
 
     addCheckableActionToQMenuAndActionHash(avatarMenu, MenuOption::NamesAboveHeads, 0, true,
-                NULL, NULL, UNSPECIFIED_POSITION, "Advanced");
+                NULL, NULL, UNSPECIFIED_POSITION, "Advanced");*/
 #endif
+
+	// Help/Application menu ----------------------------------
+    MenuWrapper* helpMenu = addMenu("Help");
+
+
+    // Help > About High Fidelity
+    addActionToQMenuAndActionHash(helpMenu, "About High Fidelity");
+
+    helpMenu->addSeparator();
+
+    // Help > HiFi Docs
+    addActionToQMenuAndActionHash(helpMenu, "HiFi Docs");
+
+    // Help > HiFi Forum
+    addActionToQMenuAndActionHash(helpMenu, "HiFi Forum");
+
+    // Help > Scripting Reference
+    addActionToQMenuAndActionHash(helpMenu, "Scripting Reference");
+
+    // Help > Controls
+    addActionToQMenuAndActionHash(helpMenu, "Controls Reference");
+
+    helpMenu->addSeparator();
+
+    // Help > Check for Updates
+    addActionToQMenuAndActionHash(helpMenu, "Check for Updates");
+
+    helpMenu->addSeparator();
+
+    // Help > Check for Updates
+    addActionToQMenuAndActionHash(helpMenu, "Release Notes");
+
+    // Help > Report a Bug!
+    addActionToQMenuAndActionHash(helpMenu, "Report a Bug!");
 }
 
 void Menu::addMenuItem(const MenuItemProperties& properties) {

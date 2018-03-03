@@ -26,7 +26,8 @@ Rectangle {
     HifiConstants { id: hifi; }
 
     property var eventBridge;
-    property string title: "Audio Settings - " + AudioScriptingInterface.context;
+    //property string title: "Audio Settings - " + AudioScriptingInterface.context;
+    property string title: "Audio Settings";
     signal sendToScript(var message);
 
     color: hifi.colors.baseGray;
@@ -59,14 +60,17 @@ Rectangle {
         height: 42
         currentIndex: isVR ? 1 : 0
 
+        /*
         AudioControls.AudioTabButton {
             height: parent.height
             text: qsTr("Desktop")
         }
+
         AudioControls.AudioTabButton {
             height: parent.height
             text: qsTr("VR")
         }
+        */
     }
 
     property bool showPeaks: true;
