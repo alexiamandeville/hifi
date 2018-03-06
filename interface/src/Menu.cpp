@@ -12,6 +12,8 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QShortcut>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include <thread>
 
@@ -43,12 +45,11 @@
 #include "ui/StandAloneJSConsole.h"
 #include "InterfaceLogging.h"
 #include "LocationBookmarks.h"
+#include "Menu.h"
 
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN)
 #include "SpeechRecognizer.h"
 #endif
-
-#include "Menu.h"
 
 extern bool DEV_DECIMATE_TEXTURES;
 
@@ -76,12 +77,8 @@ Menu::Menu() {
                 dialogsManager.data(), &DialogsManager::toggleLoginDialog);
     }
 
-    // File > Help
-    //addActionToQMenuAndActionHash(fileMenu, MenuOption::Help, 0, qApp, SLOT(showHelp()));
-
     // File > Quit
     addActionToQMenuAndActionHash(fileMenu, MenuOption::Quit, Qt::CTRL | Qt::Key_Q, qApp, SLOT(quit()), QAction::QuitRole);
-
 
     // Edit menu ----------------------------------
     MenuWrapper* editMenu = addMenu("Edit");
@@ -167,8 +164,7 @@ Menu::Menu() {
     // Edit > Reload All Content
     addActionToQMenuAndActionHash(editMenu, MenuOption::ReloadContent, 0, qApp, SLOT(reloadResourceCaches()),
                                   QAction::NoRole);
-
-    // Avatar menu ----------------------------------
+    
     auto avatarManager = DependencyManager::get<AvatarManager>();
     auto avatar = avatarManager->getMyAvatar();
     /*
@@ -208,18 +204,11 @@ Menu::Menu() {
         0, // QML Qt::Key_Apostrophe,
         qApp, SLOT(resetSensors()));
 
-    addCheckableActionToQMenuAndActionHash(avatarMenu, MenuOption::EnableAvatarCollisions, 0, true,
-        avatar.get(), SLOT(updateMotionBehaviorFromMenu()));
-
-    addCheckableActionToQMenuAndActionHash(avatarMenu, MenuOption::EnableFlying, 0, true,
-        avatar.get(), SLOT(setFlyingEnabled(bool)));
-
     // Avatar > AvatarBookmarks related menus -- Note: the AvatarBookmarks class adds its own submenus here.
     auto avatarBookmarks = DependencyManager::get<AvatarBookmarks>();
     avatarBookmarks->setupMenus(this, avatarMenu);
     */
     
-
     // Display menu ----------------------------------
     // FIXME - this is not yet matching Alan's spec because it doesn't have
     // menus for "2D"/"3D" - we need to add support for detecting the appropriate
@@ -251,7 +240,7 @@ Menu::Menu() {
 
     thirdPersonAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
 
-    // View > Mirror
+    // View > Self
     auto viewMirrorAction = cameraModeGroup->addAction(addCheckableActionToQMenuAndActionHash(
                                    viewMenu, MenuOption::FullscreenMirror, Qt::CTRL | Qt::Key_H,
                                    false, qApp, SLOT(cameraMenuChanged())));
@@ -259,22 +248,18 @@ Menu::Menu() {
     viewMirrorAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
 
     // View > Independent
-    /*
     auto viewIndependentAction = cameraModeGroup->addAction(addCheckableActionToQMenuAndActionHash(viewMenu,
         MenuOption::IndependentMode, 0,
         false, qApp, SLOT(cameraMenuChanged())));
         
     viewIndependentAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
-    */
 
     // View > Entity Camera
-    /*
     auto viewEntityCameraAction = cameraModeGroup->addAction(addCheckableActionToQMenuAndActionHash(viewMenu,
         MenuOption::CameraEntityMode, 0,
         false, qApp, SLOT(cameraMenuChanged())));
 
     viewEntityCameraAction->setProperty(EXCLUSION_GROUP_KEY, QVariant::fromValue(cameraModeGroup));
-    */
     viewMenu->addSeparator();
 
     // View > Center Player In View
@@ -287,6 +272,7 @@ Menu::Menu() {
     // View > Enter First Person Mode in HMD
     addCheckableActionToQMenuAndActionHash(viewMenu, MenuOption::FirstPersonHMD, 0, true);
 
+    //ToDo: Remove Navigation menu when these functions are included in GoTo menu
     // Navigate menu ----------------------------------
     /*
     MenuWrapper* navigateMenu = addMenu("Navigate");
@@ -314,9 +300,6 @@ Menu::Menu() {
 
     // Settings menu ----------------------------------
     MenuWrapper* settingsMenu = addMenu("Settings");
-
-    // Settings > Advanced Menus
-    //addCheckableActionToQMenuAndActionHash(settingsMenu, "Advanced Menus", 0, false, this, SLOT(toggleAdvancedMenus()));
 
     // Settings > General...
     action = addActionToQMenuAndActionHash(settingsMenu, MenuOption::Preferences, Qt::CTRL | Qt::Key_G, nullptr, nullptr, QAction::PreferencesRole);
@@ -347,9 +330,10 @@ Menu::Menu() {
         }
     });
     */
-
+    
+    //ToDo: Fix grouping. Hook up graphics settings to these parameters.
     // Settings > Graphics...
-    MenuWrapper* graphicsMenu = settingsMenu->addMenu("Graphics"); //This was in Developer menu. The menu needs to be moved here. 
+    MenuWrapper* graphicsMenu = settingsMenu->addMenu("Graphics");
     QActionGroup* graphicsSettingGroup = new QActionGroup(graphicsMenu);
 
     // Settings > Graphics > [graphics settings group]
@@ -379,14 +363,15 @@ Menu::Menu() {
         qApp->showDialog(widgetUrl, tabletUrl, name);
     });
 
+    //ToDo: Remove when Avatar app is implemented
     // Settings > Avatar...
-    /*
+    
     action = addActionToQMenuAndActionHash(settingsMenu, "Avatar...");
     connect(action, &QAction::triggered, [] {
         qApp->showDialog(QString("hifi/dialogs/AvatarPreferencesDialog.qml"),
             QString("hifi/tablet/TabletAvatarPreferences.qml"), "AvatarPreferencesDialog");
     });
-    */    
+      
 
     // Settings > Notifications
     MenuWrapper* notificationsMenu = settingsMenu->addMenu("Notifications"); //This was in notifications.js. The menu needs to be moved here. 
@@ -422,26 +407,6 @@ Menu::Menu() {
     // Settings > Notifications > Wallet Notifications
     addActionToQMenuAndActionHash(notificationsMenu, "Wallet Notifications");
 
-    // Settings > LOD...
-    /*
-    action = addActionToQMenuAndActionHash(settingsMenu, "Level of Detail (LOD)...");
-    connect(action, &QAction::triggered, [] {
-        qApp->showDialog(QString("hifi/dialogs/LodPreferencesDialog.qml"),
-            QString("hifi/tablet/TabletLodPreferences.qml"), "LodPreferencesDialog");
-    });
-    */
-
-    // Settings > Control with Speech
-#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
-    auto speechRecognizer = DependencyManager::get<SpeechRecognizer>();
-    QAction* speechRecognizerAction = addCheckableActionToQMenuAndActionHash(settingsMenu, MenuOption::ControlWithSpeech,
-        Qt::CTRL | Qt::SHIFT | Qt::Key_C,
-        speechRecognizer->getEnabled(),
-        speechRecognizer.data(),
-        SLOT(setEnabled(bool)));
-    connect(speechRecognizer.data(), SIGNAL(enabledUpdated(bool)), speechRecognizerAction, SLOT(setChecked(bool)));
-#endif
-
     // Settings > Developer Menu
     addCheckableActionToQMenuAndActionHash(settingsMenu, "Developer Menu", 0, false, this, SLOT(toggleDeveloperMenus()));
 
@@ -467,6 +432,17 @@ Menu::Menu() {
     connect(action, &QAction::triggered, [action] {
         qApp->setHmdTabletBecomesToolbarSetting(action->isChecked());
     });
+
+    // Developer > Allow Speech Control
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+    auto speechRecognizer = DependencyManager::get<SpeechRecognizer>();
+    QAction* speechRecognizerAction = addCheckableActionToQMenuAndActionHash(settingsMenu, MenuOption::ControlWithSpeech,
+        Qt::CTRL | Qt::SHIFT | Qt::Key_C,
+        speechRecognizer->getEnabled(),
+        speechRecognizer.data(),
+        SLOT(setEnabled(bool)));
+    connect(speechRecognizer.data(), SIGNAL(enabledUpdated(bool)), speechRecognizerAction, SLOT(setChecked(bool)));
+#endif
 
     // Developer > Render >>>
     MenuWrapper* renderOptionsMenu = developerMenu->addMenu("Render");
@@ -722,7 +698,6 @@ Menu::Menu() {
                                            nodeList.data(), SLOT(toggleSendNewerDSConnectVersion(bool)));
     #endif
 
-
     // Developer >> Tests >>>
     MenuWrapper* testMenu = developerMenu->addMenu("Tests");
     addActionToQMenuAndActionHash(testMenu, MenuOption::RunClientScriptTests, 0, dialogsManager.data(), SLOT(showTestingResults()));
@@ -889,36 +864,55 @@ Menu::Menu() {
 	// Help/Application menu ----------------------------------
     MenuWrapper* helpMenu = addMenu("Help");
 
-
     // Help > About High Fidelity
+    //ToDo: Add dialog to show about: Company, Version
     addActionToQMenuAndActionHash(helpMenu, "About High Fidelity");
 
     helpMenu->addSeparator();
 
     // Help > HiFi Docs
-    addActionToQMenuAndActionHash(helpMenu, "HiFi Docs");
+    action = addActionToQMenuAndActionHash(helpMenu, "HiFi Docs");
+    connect(action, &QAction::triggered, qApp,[] {
+        QDesktopServices::openUrl(QUrl("https://docs.highfidelity.com/"));
+    });
 
     // Help > HiFi Forum
-    addActionToQMenuAndActionHash(helpMenu, "HiFi Forum");
+    action = addActionToQMenuAndActionHash(helpMenu, "HiFi Forum");
+    connect(action, &QAction::triggered, qApp, [] {
+        QDesktopServices::openUrl(QUrl("https://forums.highfidelity.com/"));
+    });
 
     // Help > Scripting Reference
-    addActionToQMenuAndActionHash(helpMenu, "Scripting Reference");
+    action = addActionToQMenuAndActionHash(helpMenu, "Scripting Reference");
+    connect(action, &QAction::triggered, qApp, [] {
+        QDesktopServices::openUrl(QUrl("https://docs.highfidelity.com/api-reference"));
+    });
 
     // Help > Controls
-    addActionToQMenuAndActionHash(helpMenu, "Controls Reference");
+    action = addActionToQMenuAndActionHash(helpMenu, "Controls Reference");
+    connect(action, &QAction::triggered, qApp, [] {
+        QDesktopServices::openUrl(QUrl("https://docs.highfidelity.com/create-and-explore/explore-interface/basic-controls"));
+    });
 
     helpMenu->addSeparator();
 
     // Help > Check for Updates
+    //ToDo: Add check for updates
     addActionToQMenuAndActionHash(helpMenu, "Check for Updates");
 
     helpMenu->addSeparator();
 
-    // Help > Check for Updates
-    addActionToQMenuAndActionHash(helpMenu, "Release Notes");
+    // Help > Release Notes
+    action = addActionToQMenuAndActionHash(helpMenu, "Release Notes");
+    connect(action, &QAction::triggered, qApp, [] {
+        QDesktopServices::openUrl(QUrl("http://steamcommunity.com/games/390540/announcements/"));
+    });
 
     // Help > Report a Bug!
-    addActionToQMenuAndActionHash(helpMenu, "Report a Bug!");
+    action = addActionToQMenuAndActionHash(helpMenu, "Report a Bug!");
+    connect(action, &QAction::triggered, qApp, [] {
+        QDesktopServices::openUrl(QUrl("mailto:support@highfidelity.com"));
+    });
 }
 
 void Menu::addMenuItem(const MenuItemProperties& properties) {

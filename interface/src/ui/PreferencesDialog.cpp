@@ -81,7 +81,7 @@ void setupPreferences() {
     {
         auto getter = []()->bool { return qApp->getPreferStylusOverLaser(); };
         auto setter = [](bool value) { qApp->setPreferStylusOverLaser(value); };
-        preferences->addPreference(new CheckPreference(UI_CATEGORY, "Prefer Stylus Over Laser", getter, setter));
+        preferences->addPreference(new CheckPreference(UI_CATEGORY, "Prefer stylus over laser", getter, setter));
     }
 
     {
@@ -252,28 +252,24 @@ void setupPreferences() {
         preferences->addPreference(new CheckPreference(MOVEMENT, "Snap turn when in HMD", getter, setter));
     }
 
-    //TODO: Update with advanced movement, make sure it works
+    //TODO: Update with advanced movement logic, test that it works
     {
         auto getter = [=]()->bool { return myAvatar->useAdvancedMovementControls(); };
         auto setter = [=](bool value) { myAvatar->setUseAdvancedMovementControls(value); };
-        preferences->addPreference(new CheckPreference(MOVEMENT, "Advanced Movement Controls", getter, setter));
+        preferences->addPreference(new CheckPreference(MOVEMENT, "Advanced Movement (VR Controllers)", getter, setter));
     }
 
-    static const QString AVATAR_CAMERA { "Camera" };
+    static const QString AVATAR_CAMERA { "Mouse Sensitivity" };
     {
         auto getter = [=]()->float { return myAvatar->getPitchSpeed(); };
         auto setter = [=](float value) { myAvatar->setPitchSpeed(value); };
-        auto preference = new SpinnerPreference(AVATAR_CAMERA, "Camera pitch speed (degrees/second)", getter, setter);
-        preference->setMin(1.0f);
-        preference->setMax(360.0f);
+        auto preference = new SliderPreference(AVATAR_CAMERA, "Y Input", getter, setter);
         preferences->addPreference(preference);
     }
     {
         auto getter = [=]()->float { return myAvatar->getYawSpeed(); };
         auto setter = [=](float value) { myAvatar->setYawSpeed(value); };
-        auto preference = new SpinnerPreference(AVATAR_CAMERA, "Camera yaw speed (degrees/second)", getter, setter);
-        preference->setMin(1.0f);
-        preference->setMax(360.0f);
+        auto preference = new SliderPreference(AVATAR_CAMERA, "X Input", getter, setter);
         preferences->addPreference(preference);
     }
 

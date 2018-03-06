@@ -59,7 +59,7 @@ namespace MenuOption {
     const QString Collisions = "Collisions";
     const QString Connexion = "Activate 3D Connexion Devices";
     const QString Console = "Console...";
-    const QString ControlWithSpeech = "Control With Speech";
+    const QString ControlWithSpeech = "Allow Speech Control";
     const QString CopyAddress = "Copy Address to Clipboard";
     const QString CopyPath = "Copy Path to Clipboard";
     const QString CoupleEyelids = "Couple Eyelids";
@@ -113,7 +113,7 @@ namespace MenuOption {
     const QString FixGaze = "Fix Gaze (no saccade)";
     const QString Forward = "Forward";
     const QString FrameTimer = "Show Timer";
-    const QString FullscreenMirror = "Mirror";
+    const QString FullscreenMirror = "Self";
     const QString GraphicsHigh = "Fantastic";
     const QString GraphicsMed = "Simple";
     const QString GraphicsLow = "Fast";
