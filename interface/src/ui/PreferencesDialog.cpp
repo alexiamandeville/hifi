@@ -263,13 +263,17 @@ void setupPreferences() {
     {
         auto getter = [=]()->float { return myAvatar->getPitchSpeed(); };
         auto setter = [=](float value) { myAvatar->setPitchSpeed(value); };
-        auto preference = new SliderPreference(AVATAR_CAMERA, "Y Input", getter, setter);
+        auto preference = new SpinnerPreference(AVATAR_CAMERA, "Camera pitch speed (degrees/second)", getter, setter);
+        preference->setMin(1.0f);
+        preference->setMax(360.0f);
         preferences->addPreference(preference);
     }
     {
         auto getter = [=]()->float { return myAvatar->getYawSpeed(); };
         auto setter = [=](float value) { myAvatar->setYawSpeed(value); };
-        auto preference = new SliderPreference(AVATAR_CAMERA, "X Input", getter, setter);
+        auto preference = new SpinnerPreference(AVATAR_CAMERA, "Camera yaw speed (degrees/second)", getter, setter);
+        preference->setMin(1.0f);
+        preference->setMax(360.0f);
         preferences->addPreference(preference);
     }
 
