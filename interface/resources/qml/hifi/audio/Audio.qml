@@ -60,7 +60,7 @@ Rectangle {
         height: 42
         currentIndex: isVR ? 1 : 0
 
-        /*
+
         AudioControls.AudioTabButton {
             height: parent.height
             text: qsTr("Desktop")
@@ -70,7 +70,7 @@ Rectangle {
             height: parent.height
             text: qsTr("VR")
         }
-        */
+
     }
 
     property bool showPeaks: true;

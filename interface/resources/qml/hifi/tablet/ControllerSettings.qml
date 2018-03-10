@@ -19,7 +19,7 @@ PreferencesDialog {
     id: root
     objectName: "ControlSettings"
     title: "Control Settings"
-    showCategories: ["Movement", "Game Controller", "Face Tracking", "Sixense Controllers", "Perception Neuron", "Kinect", "Leap Motion"]
+    showCategories: ["VR Movement", "Mouse Sensitivity", "Game Controller", "Face Tracking", "Sixense Controllers", "Perception Neuron", "Kinect", "Leap Motion"]
     property var settings: Settings {
         category: root.objectName
         property alias x: root.x

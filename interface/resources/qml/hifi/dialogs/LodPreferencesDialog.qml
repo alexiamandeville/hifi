@@ -5,9 +5,9 @@ import "../../dialogs"
 
 PreferencesDialog {
     id: root
-    objectName: "LodPreferencesDialog"
-    title: "LOD Settings"
-    showCategories: ["Level of Detail Tuning"]
+    objectName: "GraphicsPreferencesDialog"
+    title: "Graphics Settings"
+    showCategories: ["Graphics Quality"]
     property var settings: Settings {
         category: root.objectName
         property alias x: root.x

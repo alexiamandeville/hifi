@@ -32,7 +32,7 @@ namespace MenuOption {
     const QString AnimDebugDrawAnimPose = "Debug Draw Animation";
     const QString AnimDebugDrawDefaultPose = "Debug Draw Default Pose";
     const QString AnimDebugDrawPosition= "Debug Draw Position";
-    const QString AskToResetSettings = "Ask To Reset Settings";
+    const QString AskToResetSettings = "Ask To Reset Settings on Start";
     const QString AssetMigration = "ATP Asset Migration";
     const QString AssetServer = "Asset Browser";
     const QString Attachments = "Attachments...";
@@ -59,7 +59,7 @@ namespace MenuOption {
     const QString Collisions = "Collisions";
     const QString Connexion = "Activate 3D Connexion Devices";
     const QString Console = "Console...";
-    const QString ControlWithSpeech = "Allow Speech Control";
+    const QString ControlWithSpeech = "Enable Speech Control (API)";
     const QString CopyAddress = "Copy Address to Clipboard";
     const QString CopyPath = "Copy Path to Clipboard";
     const QString CoupleEyelids = "Couple Eyelids";
@@ -113,7 +113,7 @@ namespace MenuOption {
     const QString FixGaze = "Fix Gaze (no saccade)";
     const QString Forward = "Forward";
     const QString FrameTimer = "Show Timer";
-    const QString FullscreenMirror = "Self";
+    const QString FullscreenMirror = "Mirror";
     const QString GraphicsHigh = "Fantastic";
     const QString GraphicsMed = "Simple";
     const QString GraphicsLow = "Fast";
@@ -139,7 +139,7 @@ namespace MenuOption {
     const QString OnlyDisplayTopTen = "Only Display Top Ten";
     const QString OpenVrThreadedSubmit = "OpenVR Threaded Submit"; 
     const QString OutputMenu = "Display";
-    const QString Overlays = "Show Overlays";
+    const QString Overlays = "Show UI";
     const QString PackageModel = "Package Model as .fst...";
     const QString Pair = "Pair";
     const QString PhysicsShowHulls = "Draw Collision Shapes";
@@ -189,7 +189,7 @@ namespace MenuOption {
     const QString SimulateEyeTracking = "Simulate";
     const QString SMIEyeTracking = "SMI Eye Tracking";
     const QString SparseTextureManagement = "Enable Sparse Texture Management";
-    const QString Stats = "Stats";
+    const QString Stats = "Show Statistics";
     const QString StopAllScripts = "Stop All Scripts";
     const QString SuppressShortTimings = "Suppress Timings Less than 10ms";
     const QString ThirdPerson = "Third Person";

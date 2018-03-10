@@ -50,6 +50,7 @@ function calcSpawnInfo(hand, landscape) {
     var forward = Quat.getForward(Quat.cancelOutRollAndPitch(headRot));
     var FORWARD_OFFSET = 0.5 * MyAvatar.sensorToWorldScale;
     finalPosition = Vec3.sum(headPos, Vec3.multiply(FORWARD_OFFSET, forward));
+	finalPosition = new Vec3(finalPosition.x, finalPosition.y, finalPosition.z + 5.0) //updated for player offset
     var orientation = Quat.lookAt({x: 0, y: 0, z: 0}, forward, Vec3.multiplyQbyV(MyAvatar.orientation, Vec3.UNIT_Y));
     return {
         position: finalPosition,

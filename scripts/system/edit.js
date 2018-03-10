@@ -1097,8 +1097,7 @@ function setupModelMenus() {
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Entities",
-        isSeparator: true,
-        grouping: "Advanced"
+        isSeparator: true
     });
     if (!Menu.menuItemExists("Edit", "Delete")) {
         Menu.addMenuItem({
@@ -1107,30 +1106,26 @@ function setupModelMenus() {
             shortcutKeyEvent: {
                 text: "delete"
             },
-            afterItem: "Entities",
-            grouping: "Advanced"
+            afterItem: "Entities"
         });
         modelMenuAddedDelete = true;
     }
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Entity List...",
-        afterItem: "Entities",
-        grouping: "Advanced"
+        afterItem: "Entities"
     });
 
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Parent Entity to Last",
-        afterItem: "Entity List...",
-        grouping: "Advanced"
+        afterItem: "Entity List..."
     });
 
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Unparent Entity",
-        afterItem: "Parent Entity to Last",
-        grouping: "Advanced"
+        afterItem: "Parent Entity to Last"
     });
 
     Menu.addMenuItem({
@@ -1138,8 +1133,7 @@ function setupModelMenus() {
         menuItemName: GRABBABLE_ENTITIES_MENU_ITEM,
         afterItem: "Unparent Entity",
         isCheckable: true,
-        isChecked: true,
-        grouping: "Advanced"
+        isChecked: true
     });
 
     Menu.addMenuItem({
@@ -1147,86 +1141,74 @@ function setupModelMenus() {
         menuItemName: "Allow Selecting of Large Models",
         afterItem: GRABBABLE_ENTITIES_MENU_ITEM,
         isCheckable: true,
-        isChecked: true,
-        grouping: "Advanced"
+        isChecked: true
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Allow Selecting of Small Models",
         afterItem: "Allow Selecting of Large Models",
         isCheckable: true,
-        isChecked: true,
-        grouping: "Advanced"
+        isChecked: true
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Allow Selecting of Lights",
         afterItem: "Allow Selecting of Small Models",
-        isCheckable: true,
-        grouping: "Advanced"
+        isCheckable: true
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Select All Entities In Box",
-        afterItem: "Allow Selecting of Lights",
-        grouping: "Advanced"
+        afterItem: "Allow Selecting of Lights"
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Select All Entities Touching Box",
-        afterItem: "Select All Entities In Box",
-        grouping: "Advanced"
+        afterItem: "Select All Entities In Box"
     });
 
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Export Entities",
-        afterItem: "Entities",
-        grouping: "Advanced"
+        afterItem: "Entities"
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Import Entities",
-        afterItem: "Export Entities",
-        grouping: "Advanced"
+        afterItem: "Export Entities"
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: "Import Entities from URL",
-        afterItem: "Import Entities",
-        grouping: "Advanced"
+        afterItem: "Import Entities"
     });
 
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: MENU_AUTO_FOCUS_ON_SELECT,
         isCheckable: true,
-        isChecked: Settings.getValue(SETTING_AUTO_FOCUS_ON_SELECT) === "true",
-        grouping: "Advanced"
+        isChecked: Settings.getValue(SETTING_AUTO_FOCUS_ON_SELECT) === "true"
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: MENU_EASE_ON_FOCUS,
         afterItem: MENU_AUTO_FOCUS_ON_SELECT,
         isCheckable: true,
-        isChecked: Settings.getValue(SETTING_EASE_ON_FOCUS) === "true",
-        grouping: "Advanced"
+        isChecked: Settings.getValue(SETTING_EASE_ON_FOCUS) === "true"
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: MENU_SHOW_LIGHTS_AND_PARTICLES_IN_EDIT_MODE,
         afterItem: MENU_EASE_ON_FOCUS,
         isCheckable: true,
-        isChecked: Settings.getValue(SETTING_SHOW_LIGHTS_AND_PARTICLES_IN_EDIT_MODE) !== "false",
-        grouping: "Advanced"
+        isChecked: Settings.getValue(SETTING_SHOW_LIGHTS_AND_PARTICLES_IN_EDIT_MODE) !== "false"
     });
     Menu.addMenuItem({
         menuName: "Edit",
         menuItemName: MENU_SHOW_ZONES_IN_EDIT_MODE,
         afterItem: MENU_SHOW_LIGHTS_AND_PARTICLES_IN_EDIT_MODE,
         isCheckable: true,
-        isChecked: Settings.getValue(SETTING_SHOW_ZONES_IN_EDIT_MODE) !== "false",
-        grouping: "Advanced"
+        isChecked: Settings.getValue(SETTING_SHOW_ZONES_IN_EDIT_MODE) !== "false"
     });
 
     Entities.setLightsArePickable(false);
