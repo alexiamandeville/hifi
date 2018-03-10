@@ -63,6 +63,23 @@ Menu::Menu() {
     auto dialogsManager = DependencyManager::get<DialogsManager>();
     auto accountManager = DependencyManager::get<AccountManager>();
 
+    // File/Application menu ----------------------------------
+    MenuWrapper* fileMenu = addMenu("File");
+
+    // File > Login menu items
+    {
+        addActionToQMenuAndActionHash(fileMenu, MenuOption::Login);
+
+        // connect to the appropriate signal of the AccountManager so that we can change the Login/Logout menu item
+        connect(accountManager.data(), &AccountManager::profileChanged,
+            dialogsManager.data(), &DialogsManager::toggleLoginDialog);
+        connect(accountManager.data(), &AccountManager::logoutComplete,
+            dialogsManager.data(), &DialogsManager::toggleLoginDialog);
+    }
+
+    // File > Quit
+    addActionToQMenuAndActionHash(fileMenu, MenuOption::Quit, Qt::CTRL | Qt::Key_Q, qApp, SLOT(quit()), QAction::QuitRole);
+
     // Edit menu ----------------------------------
     MenuWrapper* editMenu = addMenu("Edit");
 
@@ -849,21 +866,6 @@ Menu::Menu() {
     connect(action, &QAction::triggered, qApp, [] {
         QDesktopServices::openUrl(QUrl("mailto:support@highfidelity.com"));
     });
-
-    // Login menu ----------------------------------
-    MenuWrapper* loginMenu = addMenu(MenuOption::Login);
-
-    //TODO: Move this action up into the menu bar, not a dropdown
-    // Login menu items
-    {
-        addActionToQMenuAndActionHash(loginMenu, MenuOption::Login);
-
-        // connect to the appropriate signal of the AccountManager so that we can change the Login/Logout menu item
-        connect(accountManager.data(), &AccountManager::profileChanged,
-            dialogsManager.data(), &DialogsManager::toggleLoginDialog);
-        connect(accountManager.data(), &AccountManager::logoutComplete,
-            dialogsManager.data(), &DialogsManager::toggleLoginDialog);
-    }
 }
 
 void Menu::addMenuItem(const MenuItemProperties& properties) {
