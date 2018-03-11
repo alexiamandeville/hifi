@@ -88,6 +88,9 @@ const float MyAvatar::ZOOM_MAX = 25.0f;
 const float MyAvatar::ZOOM_DEFAULT = 1.5f;
 const float MIN_SCALE_CHANGED_DELTA = 0.001f;
 
+const float DIRECTION_SPEED_MULT = 1.25f;
+
+
 MyAvatar::MyAvatar(QThread* thread) :
     Avatar(thread),
     _yawSpeed(YAW_SPEED_DEFAULT),
@@ -2203,6 +2206,8 @@ void MyAvatar::updateActionMotor(float deltaTime) {
     } else {
         direction = Vectors::ZERO;
     }
+
+    direction *= DIRECTION_SPEED_MULT;
 
     if (state == CharacterController::State::Hover) {
         // we're flying --> complex acceleration curve that builds on top of current motor speed and caps at some max speed
