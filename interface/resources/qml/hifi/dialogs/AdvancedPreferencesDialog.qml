@@ -16,8 +16,8 @@ import "../../dialogs"
 PreferencesDialog {
     id: root
     objectName: "AdvancedPreferencesDialog"
-    title: "View Settings"
-    showCategories: ["View" ]
+    title: "Advanced Settings"
+    showCategories: ["Advanced UI" ]
     property var settings: Settings {
         category: root.objectName
         property alias x: root.x
