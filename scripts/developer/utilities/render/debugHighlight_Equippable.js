@@ -30,7 +30,7 @@
         }
     }
 	
-	//Script.update.connect(hoverDistance);
+	Script.update.connect(hoverDistance);
 	
 	function hoverDistance() {
 
@@ -56,6 +56,11 @@
 			
 		
 	}
+    
+    Controller.startNearGrab.connect( function(entityID, mouseEvent) { 
+		print("grabbing");  
+    })
+    
 	
     var tablet = Tablet.getTablet("com.highfidelity.interface.tablet.system");
     var button = tablet.addButton({
