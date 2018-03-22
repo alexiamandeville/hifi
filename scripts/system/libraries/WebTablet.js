@@ -29,8 +29,10 @@ var INCHES_TO_METERS = 1 / 39.3701;
 var NO_HANDS = -1;
 var DELAY_FOR_30HZ = 33; // milliseconds
 
+var myProto = 2; //change this to change prototypes 1. Spawn a tablet in a static position in front of my avatar. 2. Spawn a tablet on the wrists.
 
-// will need to be recaclulated if dimensions of fbx model change.
+
+// will need to be recaclulated if dimensions of fbx model change
 var TABLET_NATURAL_DIMENSIONS = {x: 33.797, y: 50.129, z: 2.269};
 
 var HOME_BUTTON_TEXTURE = "http://hifi-content.s3.amazonaws.com/alan/dev/tablet-with-home-button.fbx/tablet-with-home-button.fbm/button-close.png";
@@ -42,16 +44,69 @@ var LOCAL_TABLET_MODEL_PATH = Script.resourcesPath() + "meshes/tablet-with-home-
 //    * position - position in front of the user
 //    * rotation - rotation of entity so it faces the user.
 function calcSpawnInfo(hand, landscape) {
-    var finalPosition;
-
+    var finalPosition;	
+	
     var headPos = (HMD.active && Camera.mode === "first person") ? HMD.position : Camera.position;
     var headRot = (HMD.active && Camera.mode === "first person") ? HMD.orientation : Camera.orientation;
-    var dominantHandRotation =  MyAvatar.getDominantHand() === "right" ? -20 : 20;
-    var offsetRotation = Quat.fromPitchYawRollDegrees(0, dominantHandRotation, 0);
-    var forward = Vec3.multiplyQbyV(offsetRotation, Quat.getForward(Quat.cancelOutRollAndPitch(headRot)));
-    var FORWARD_OFFSET = 0.5 * MyAvatar.sensorToWorldScale;
-    finalPosition = Vec3.sum(headPos, Vec3.multiply(FORWARD_OFFSET, forward));
-    var orientation = Quat.lookAt({x: 0, y: 0, z: 0}, forward, Vec3.multiplyQbyV(MyAvatar.orientation, Vec3.UNIT_Y));
+	
+	headRot = Quat.cancelOutRoll(headRot);
+	headRot = Quat.cancelOutRollAndPitch(headRot); 
+	
+	var right = Quat.getRight(headRot);
+    var forward = Quat.getForward(headRot);
+	var up = Quat.getUp(headRot);
+	
+	var FORWARD_OFFSET = 0.5 * MyAvatar.sensorToWorldScale;
+	var UP_OFFSET = -0.16 * MyAvatar.sensorToWorldScale; 
+	
+	if (hand == Controller.Standard.LeftHand)
+		var RIGHT_OFFSET = -0.18 * MyAvatar.sensorToWorldScale;
+	
+	if (hand == Controller.Standard.RightHand)
+		var RIGHT_OFFSET = 0.18 * MyAvatar.sensorToWorldScale;
+
+    finalPosition = Vec3.sum(headPos, Vec3.multiply(FORWARD_OFFSET, forward)); //move forward
+	finalPosition = Vec3.sum(finalPosition, Vec3.multiply(RIGHT_OFFSET, right)); //move right/left depending on hand
+	finalPosition = Vec3.sum(finalPosition, Vec3.multiply(UP_OFFSET, up)); //move down
+	
+	var myEyes = {x: 0, y: 0.15, z: 0};
+	
+	//look at the avatar
+    var orientation = Quat.lookAt(myEyes, Vec3.sum(Vec3.multiply(RIGHT_OFFSET, right), Vec3.multiply(FORWARD_OFFSET, forward)), Vec3.multiplyQbyV(MyAvatar.orientation, Vec3.UNIT_Y));
+		
+    return {
+        position: finalPosition,
+        rotation: landscape ? Quat.multiply(orientation, ROT_LANDSCAPE) : Quat.multiply(orientation, ROT_Y_180)
+    };
+}
+
+function calcSpawnOnHandInfo(hand, landscape) {
+    var finalPosition;	
+    var headPos = (HMD.active && Camera.mode === "first person") ? HMD.position : Camera.position;
+    var headRot = (HMD.active && Camera.mode === "first person") ? HMD.orientation : Camera.orientation;
+	
+	headRot = Quat.cancelOutRoll(headRot);
+	headRot = Quat.cancelOutRollAndPitch(headRot); 
+	
+	var right = Quat.getRight(headRot);
+    var forward = Quat.getForward(headRot);
+	var up = Quat.getUp(headRot);
+	
+	var FORWARD_OFFSET = 0.5 * MyAvatar.sensorToWorldScale;
+	var UP_OFFSET = 0.25 * MyAvatar.sensorToWorldScale;
+        
+    var pose = Controller.getPoseValue(hand);
+    
+    var myHand = {x: pose.translation.x, y: pose.translation.y, z: pose.translation.z};
+
+    finalPosition = Vec3.sum(Vec3.multiplyQbyV(MyAvatar.orientation, myHand), MyAvatar.position);
+    finalPosition = {x: finalPosition.x, y: finalPosition.y + UP_OFFSET, z: finalPosition.z};
+	
+	var myEyes = {x: 0, y: 0.15, z: 0};
+	
+	//look at the avatar
+    var orientation = Quat.lookAt(myEyes, forward, Vec3.multiplyQbyV(MyAvatar.orientation, Vec3.UNIT_Y));
+		
     return {
         position: finalPosition,
         rotation: landscape ? Quat.multiply(orientation, ROT_LANDSCAPE) : Quat.multiply(orientation, ROT_Y_180)
@@ -67,7 +122,7 @@ function calcSpawnInfo(hand, landscape) {
  * @param clientOnly [bool] true indicates tablet model is only visible to client.
  */
 WebTablet = function (url, width, dpi, hand, clientOnly, location, visible) {
-
+    //Script.update.connect(calcSpawnOnHandInfo);
     var _this = this;
 
     var sensorScaleFactor = MyAvatar.sensorToWorldScale;
@@ -110,9 +165,10 @@ WebTablet = function (url, width, dpi, hand, clientOnly, location, visible) {
         tabletProperties.localPosition = location.localPosition;
         tabletProperties.localRotation = location.localRotation;
     }
+    
 
     this.cleanUpOldTablets();
-
+    
     this.tabletEntityID = Overlays.addOverlay("model", tabletProperties);
 
     if (this.webOverlayID) {
@@ -270,9 +326,8 @@ WebTablet.prototype.setLandscape = function(newLandscapeValue) {
     }
 
     this.landscape = newLandscapeValue;
-    var cameraOrientation = Quat.cancelOutRollAndPitch(Camera.orientation);
     Overlays.editOverlay(this.tabletEntityID,
-                         { rotation: Quat.multiply(cameraOrientation, this.landscape ? ROT_LANDSCAPE : ROT_Y_180) });
+                         { rotation: Quat.multiply(Camera.orientation, this.landscape ? ROT_LANDSCAPE : ROT_Y_180) });
 
     var tabletWidth = getTabletWidthFromSettings() * MyAvatar.sensorToWorldScale;
     var tabletScaleFactor = tabletWidth / TABLET_NATURAL_DIMENSIONS.x;
@@ -280,7 +335,7 @@ WebTablet.prototype.setLandscape = function(newLandscapeValue) {
     var screenWidth = 0.82 * tabletWidth;
     var screenHeight = 0.81 * tabletHeight;
     Overlays.editOverlay(this.webOverlayID, {
-        rotation: Quat.multiply(cameraOrientation, ROT_LANDSCAPE_WINDOW),
+        rotation: Quat.multiply(Camera.orientation, ROT_LANDSCAPE_WINDOW),
         dimensions: {x: this.landscape ? screenHeight : screenWidth, y: this.landscape ? screenWidth : screenHeight, z: 0.1}
     });
 };
@@ -305,6 +360,10 @@ WebTablet.prototype.setURL = function (url) {
 
 WebTablet.prototype.setScriptURL = function (scriptURL) {
     Overlays.editOverlay(this.webOverlayID, { scriptURL: scriptURL });
+};
+
+WebTablet.prototype.getOverlayObject = function () {
+    return Overlays.getOverlayObject(this.webOverlayID);
 };
 
 WebTablet.prototype.setWidth = function (width) {
@@ -332,7 +391,7 @@ WebTablet.prototype.destroy = function () {
 };
 
 WebTablet.prototype.geometryChanged = function (geometry) {
-    if (!HMD.active && HMD.tabletID) {
+    if (!HMD.active) {
         var tabletProperties = {};
         // compute position, rotation & parentJointIndex of the tablet
         this.calculateTabletAttachmentProperties(NO_HANDS, false, tabletProperties);
@@ -433,11 +492,46 @@ WebTablet.prototype.onHoverLeaveOverlay = function (overlayID, pointerEvent) {
 // compute position, rotation & parentJointIndex of the tablet
 WebTablet.prototype.calculateTabletAttachmentProperties = function (hand, useMouse, tabletProperties) {
     if (HMD.active) {
+        
         // in HMD mode, the tablet should be relative to the sensor to world matrix.
-        tabletProperties.parentJointIndex = SENSOR_TO_ROOM_MATRIX;
+        if (myProto == 1) tabletProperties.parentJointIndex = SENSOR_TO_ROOM_MATRIX;
+        
+        if (myProto == 2) {
+	
+            var headPos = (HMD.active && Camera.mode === "first person") ? HMD.position : Camera.position;
+            var headRot = (HMD.active && Camera.mode === "first person") ? HMD.orientation : Camera.orientation;
+            
+            headRot = Quat.cancelOutRoll(headRot);
+            headRot = Quat.cancelOutRollAndPitch(headRot); 
+            
+            var right = Quat.getRight(headRot);
+            var forward = Quat.getForward(headRot);
+            var up = Quat.getUp(headRot);
+            
+            var FORWARD_OFFSET = 3.5 * MyAvatar.sensorToWorldScale;
+            var UP_OFFSET = -0.16 * MyAvatar.sensorToWorldScale; 
+                        
+            if (hand == Controller.Standard.LeftHand){
+                tabletProperties.parentJointIndex = MyAvatar.getJointIndex("LeftHand");
+                tabletProperties.position = MyAvatar.getJointPosition("LeftHand")
+                tabletProperties.localPosition = {x: -0.3, y: 0.45, z: -0.1};
+            }
+                
+            if (hand == Controller.Standard.RightHand){
+                tabletProperties.parentJointIndex = MyAvatar.getJointIndex("RightForeArm");
+                tabletProperties.position = MyAvatar.getJointPosition("RightHand");
+                tabletProperties.localPosition = {x: 0.3, y: 0.45, z: -0.1};
+            }
+               
+            var myEyes = {x: 0, y: 0.15, z: 0};
+            
+            //look at the avatar
+            var orientation =  Quat.lookAt(myEyes, forward, Vec3.multiplyQbyV(MyAvatar.orientation, Vec3.UNIT_Y));
+        }
 
         // compute the appropriate position of the tablet, near the hand controller that was used to spawn it.
-        var spawnInfo = calcSpawnInfo(hand, this.landscape);
+        if (myProto == 1) var spawnInfo = calcSpawnInfo(hand, this.landscape);
+        if (myProto == 2) var spawnInfo = calcSpawnOnHandInfo(hand, this.landscape);
         tabletProperties.position = spawnInfo.position;
         tabletProperties.rotation = spawnInfo.rotation;
     } else {
@@ -460,9 +554,6 @@ WebTablet.prototype.calculateTabletAttachmentProperties = function (hand, useMou
 };
 
 WebTablet.prototype.onHmdChanged = function () {
-    if (!HMD.tabletID) {
-        return;
-    }
     var tabletProperties = {};
     // compute position, rotation & parentJointIndex of the tablet
     this.calculateTabletAttachmentProperties(NO_HANDS, false, tabletProperties);
@@ -583,6 +674,7 @@ WebTablet.prototype.mouseMoveEvent = function (event) {
         this.handleHomeButtonHover(event.x, event.y);
     }
 };
+
 
 WebTablet.prototype.mouseMoveProcessor = function () {
     this.moveEventTimer = null;
