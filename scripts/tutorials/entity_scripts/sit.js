@@ -22,7 +22,7 @@
     var ANIMATION_FPS = 30;
     var ANIMATION_FIRST_FRAME = 1;
     var ANIMATION_LAST_FRAME = 10;
-    var RELEASE_TIME = 500; // ms
+    var RELEASE_TIME = 5; // ms
     var RELEASE_DISTANCE = 0.2; // meters
     var MAX_IK_ERROR = 30;
     var IK_SETTLE_TIME = 250; // ms

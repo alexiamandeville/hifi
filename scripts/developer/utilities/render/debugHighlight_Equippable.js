@@ -30,7 +30,7 @@
         }
     }
 	
-	Script.update.connect(hoverDistance);
+	//Script.update.connect(hoverDistance);
 	
 	function hoverDistance() {
 
@@ -44,22 +44,55 @@
 			var dist = Vec3.distance(handPosition, pos);
 			
 			var str = Entities.getEntityProperties(hoverEnt).userData;
-		    var obj = JSON.parse(str);
-		    if(obj.grabbableKey.grabbable){ //if grabbable
-  
-				if(dist <= 0.45){ //glow if it's within hover
-					if (isSelectionEnabled) Selection.addToSelectedItemsList(HoveringList, "entity", hoverEnt)
-				} else {
-					if (isSelectionEnabled)  Selection.removeFromSelectedItemsList(HoveringList, "entity", hoverEnt)	
-				}
-			}
+            
+            if(typeof str !== 'undefined') {
+                var obj = JSON.parse(str);
+
+                if(obj.grabbableKey.grabbable){ //if grabbable
+      
+                    if(dist <= 0.45){ //glow if it's within hover
+                        if (isSelectionEnabled) Selection.addToSelectedItemsList(HoveringList, "entity", hoverEnt)
+                    } else {
+                        if (isSelectionEnabled)  Selection.removeFromSelectedItemsList(HoveringList, "entity", hoverEnt)	
+                    }
+                }
+            }
 			
 		
 	}
     
-    Controller.startNearGrab.connect( function(entityID, mouseEvent) { 
-		print("grabbing");  
-    })
+    Messages.subscribe('Hifi-Object-Manipulation');
+    Messages.messageReceived.connect(function (channel, message, sender) {
+        if (sender !== MyAvatar.sessionUUID) {
+            return;
+        }
+        if (channel !== 'Hifi-Object-Manipulation') {
+            return;
+        }
+        try {
+            var data = JSON.parse(message);
+            var action = data.action;
+            var entity = data.grabbedEntity;  // UUID
+            var hand = data.joint;  // "RightHand" or "LeftHand"
+            var myChilds = Entities.getChildrenIDs(entity);
+            var timer = 3;
+
+            if (action === "grab") {
+                // an object was near grabbed
+                Entities.editEntity(myChilds[0], {visible: true});
+
+                Entities.editEntity(entity, {position: MyAvatar.getJointPosition("RightHand")});
+                
+            } else if (action === "equip") {
+                // an object was equipped
+            } else if (action === "release") {
+                // sent for when equip is ended and when near grab is ended.
+                Entities.editEntity(myChilds[0], {visible: false});
+            }
+        }  catch (e) {
+            print("OMG! -- error parsing Hifi-Object-Manipulation message: " + message);
+        }
+    });
     
 	
     var tablet = Tablet.getTablet("com.highfidelity.interface.tablet.system");
@@ -178,21 +211,21 @@
     Entities.hoverEnterEntity.connect(function (id, event) {
       // print("hoverEnterEntity");
 	  var str = Entities.getEntityProperties(id).userData;
-      var obj = JSON.parse(str);
-	  if(obj.grabbableKey.grabbable){ //if grabbable
-		  if (isSelectionEnabled) Selection.addToSelectedItemsList(HoveringList, "entity", id)
-	  }
+      if(typeof str !== 'undefined') {
+          var obj = JSON.parse(str);
+          if(obj.grabbableKey.grabbable){ //if grabbable
+              if (isSelectionEnabled) Selection.addToSelectedItemsList(HoveringList, "entity", id)
+          }
+      }
 	  
     })
 	
 	Entities.mousePressOnEntity.connect( function(entityID, mouseEvent) { 
         //Entities.editEntity(entityID, { color: { red: 0, green: 255, blue: 0} });
-		print("pressing");  
     })
 	
 	Entities.mouseReleaseOnEntity.connect( function(entityID, mouseEvent) { 
         //Entities.editEntity(entityID, { color: { red: 0, green: 255, blue: 0} });
-		print("not pressing");  
     })
     
     Entities.hoverOverEntity.connect(function (id, event) {
