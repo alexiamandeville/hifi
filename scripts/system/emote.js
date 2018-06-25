@@ -137,10 +137,6 @@ eventMapping.from(Controller.Standard.LeftSecondaryThumb).peek().to(restoreAnima
 eventMapping.from(Controller.Standard.RightSecondaryThumb).peek().to(restoreAnimation);
 eventMapping.from(Controller.Standard.LB).peek().to(restoreAnimation);
 eventMapping.from(Controller.Standard.LS).peek().to(restoreAnimation);
-eventMapping.from(Controller.Standard.RY).peek().to(restoreAnimation);
-eventMapping.from(Controller.Standard.RX).peek().to(restoreAnimation);
-eventMapping.from(Controller.Standard.LY).peek().to(restoreAnimation);
-eventMapping.from(Controller.Standard.LX).peek().to(restoreAnimation);
 eventMapping.from(Controller.Standard.LeftGrip).peek().to(restoreAnimation);
 eventMapping.from(Controller.Standard.RB).peek().to(restoreAnimation);
 eventMapping.from(Controller.Standard.RS).peek().to(restoreAnimation);
